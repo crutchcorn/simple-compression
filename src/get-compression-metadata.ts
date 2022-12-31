@@ -1,6 +1,14 @@
 const min = 2;
 
-export const compress = (v: number[], size = Math.floor(v.length / 2)) => {
+export interface CompressMetadata {
+  __isMetadata: true,
+  index: number,
+  size: number,
+}
+
+export const getCompressionMetadata = <T>(v: T[], size = Math.floor(v.length / 2)): Array<
+T | CompressMetadata
+> => {
   if (size < min) {
     return v;
   }
@@ -23,10 +31,11 @@ export const compress = (v: number[], size = Math.floor(v.length / 2)) => {
           v.splice(compareIndex, size, {
             index: baseIndex,
             size,
-          } as never);
+            __isMetadata: true
+          } as CompressMetadata as never);
         }
       }
     }
   }
-  return compress(v, size - 1);
+  return getCompressionMetadata(v, size - 1);
 };
